@@ -1,0 +1,105 @@
+* how ot delete a dir from hdfs -
+hdfs dfs rm -r /ddd/ddd/assd/..
+
+* put file command
+
+(1)
+2 steps to import csv file
+hdfs dfs -put /home/username/file.csv /user/data/file.csv
+
+hdfs dfs -put ~/workspace/tssdemo/src/main/resources/csv/emp1.csv /tssdemo/l1
+
+hdfs dfs -put ~/workspace/tssdemo/src/main/resources/parquet/emp1.parquet /tssdemo/l2/parquet/
+(2)
+read file from hdfs
+val file = sc.textFile("hdfs://quickstart.cloudera:8020/user/Cloudera/Test")
+http://localhost:50070/user/Cloudera/Test
+
+(3)
+
+org.apache.spark.sql.AnalysisException
+
+(4) Impala querry to make .sql file
+impala-shell -i localhost --quiet
+show databases;
+use default;
+select current_database();
+drop table if exists emp1;
+create external table emp1(empid String, empname String, emplocation String, empscore Int, empoldsalary Float, empnewsalary Float);
+desc emp1;
+DESCRIBE FORMATTED table_name
+ALTER TABLE emp1 SET TBLPROPERTIES('EXTERNAL'='FALSE');
+
+CREATE external TABLE emp1 LIKE PARQUET '/user/etl/destination/datafile1.dat'
+  STORED AS PARQUET
+  LOCATION '/user/etl/destination';
+
+create table emp1 like parquet '/tssdemo/l2/parquet/emp1.parquet/_metadata' stored as parquet;
+
+create external table emp1 like parquet '/tssdemo/l2/parquet/emp1.parquet/_metadata' stored as parquet location '/user/hive/warehouse/emp1';
+
+load data inpath '/tssdemo/l2/parquet/emp1.parquet/' into table emp1;
+
+_metadata
+_SUCCESS - XX
+_common_metadata
+
+refresh tabel123;
+INVALIDATE METADATA emp1;
+
+chmod -R 777
+
+hdfs dfs -chmod -R 777 /tssdemo/l2/parquet/emp1.parquet
+hdfs dfs -ls -R /tssdemo/l2/parquet/emp1.parquet
+
+Shell script:-
+#! /bin/bash
+#Downloading HDFS file to Local Unix & Reformatting
+
+hdfs dfs -put /local/path /hdfs/path
+
+Note:- save as ".sh" file.
+
+Execute Shell script:-
+chmod +x /path/to/yourscript.sh
+
+sh ~/workspace/tssdemo/src/main/resources/script/rundemo.sh
+
+
+impala cmd
+
+impala-shell -q 'use default;'
+
+impala-shell -q 'drop table if exists emp1;'
+
+echo --Creating New Parquet table in Imapal as EMP1 .....
+
+impala-shell -q 'create table emp1 like parquet /tssdemo2/l2/parquet/emp1.parquet/_metadata stored as parquet;'
+
+echo --Checking the Schema of table emp1 inherited from parquet .....
+
+impala-shell -q 'desc emp1;'
+
+echo --Loading values to table from parquet file .....
+
+impala-shell -q 'load data inpath '/tssdemo2/l2/parquet/emp1.parquet/' into table emp1;'
+
+echo --Display Complete table content for emp1;
+
+impala-shell -q 'select * from emp1;'
+
+echo --Query-1 : Find the list of employee scoring 75 and more .....
+
+impala-shell -q 'select * from emp1 where empscore>=75;'
+
+echo --Query-2 : Find the Total Increase in Salary per employee  .....
+
+impala-shell -q 'select Sum(empnewsalary-empoldsalary)/count(*) As TotalIncrement from emp1;'
+
+sh ~/workspace/tssdemo/src/main/resources/script/rundemo.sh
+
+sh ~/workspace/tssdemo/src/main/resources/script/rundemo.sh
+
+sh ~/lib/demojar/tss.demo-1.0-SNAPSHOT.jar/script/rundemo.sh
+
+java -cp ~/lib/demojar/tss.demo-1.0-SNAPSHOT.jar sh script/rundemo.sh
